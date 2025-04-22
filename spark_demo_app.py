@@ -104,14 +104,15 @@ if 'initialized' not in st.session_state:
 # --- API Clients ---
 # Spotify Client
 @st.cache_resource
+
 def get_spotify_client():
     return spotipy.Spotify(auth_manager=SpotifyOAuth(
         client_id=SPOTIFY_CLIENT_ID,
         client_secret=SPOTIFY_CLIENT_SECRET,
-        redirect_uri=SPOTIFY_REDIRECT_URI,
-        scope="user-library-read user-top-read playlist-modify-public user-follow-read"
+        redirect_uri="https://emlee66-sparks-demo-app.streamlit.app",  # Use your live app URL
+        scope="user-library-read user-top-read",
+        open_browser=False
     ))
-
 sp = get_spotify_client()
 
 # YouTube Music Client
@@ -312,7 +313,7 @@ with st.sidebar:
 
 # --- Main Content ---
 # Home & Discover
-if "🏠 Home & Discover" in menu:
+if menu =="🏠 Home & Discover":
     st.markdown("<h1 class='main-header'>Music Discovery</h1>", unsafe_allow_html=True)
     
     tabs = st.tabs(["Your Top Tracks", "Recommendations", "Explore"])
@@ -350,11 +351,11 @@ if "🏠 Home & Discover" in menu:
                 # YouTube embed search query
 
 
-video_id = get_youtube_video_id(track_name, artist_name)
-if video_id:
-    st.components.v1.iframe(f"https://www.youtube.com/embed/{video_id}", height=315)
-else:
-    st.info("No playable YouTube video found.")
+    video_id = get_youtube_video_id(track_name, artist_name)
+    if video_id:
+        st.components.v1.iframe(f"https://www.youtube.com/embed/{video_id}", height=315)
+    else:
+        st.info("No playable YouTube video found.")
 
     # Track controls
     col_prev, col_save, col_next = st.columns(3)
@@ -382,32 +383,29 @@ else:
             else:
                 st.session_state.current_index = 0
                 st.rerun()
-            else:
-                st.write("No top tracks found. Make sure your Spotify account has listening history.")
-        
-        with col2:
-            if track_list:
-                # Display artist image
-                artist_image = get_artist_image(artist_id)
-                st.image(artist_image, width=200)
-                
-                # Track feedback
-                st.markdown("### Your Feedback")
-                st.text_input("Describe this track:", key="feedback_text")
-                st.select_slider(
-                    "Energy level:",
-                    options=["Chill", "Moderate", "Energetic"],
-                    value="Moderate",
-                    key="energy_feedback"
-                )
-                st.radio(
-                    "Your reaction:", 
-                    ["🌟 Feels fresh", "🧠 Love it", "😕 Too polished", "🔎 Intriguing but unsure"], 
-                    key="reaction"
-                )
-                
-                if st.button("Submit Feedback"):
-                    st.success("Thanks for your feedback! We'll use it to improve your recommendations.")
+    with col2:
+        if track_list:
+            # Display artist image
+            artist_image = get_artist_image(artist_id)
+            st.image(artist_image, width=200)
+            
+            # Track feedback
+            st.markdown("### Your Feedback")
+            st.text_input("Describe this track:", key="feedback_text")
+            st.select_slider(
+                "Energy level:",
+                options=["Chill", "Moderate", "Energetic"],
+                value="Moderate",
+                key="energy_feedback"
+            )
+            st.radio(
+                "Your reaction:", 
+                ["🌟 Feels fresh", "🧠 Love it", "😕 Too polished", "🔎 Intriguing but unsure"], 
+                key="reaction"
+            )
+            
+        if st.button("Submit Feedback"):
+            st.success("Thanks for your feedback! We'll use it to improve your recommendations.")
     
     # Recommendations Tab
     with tabs[1]:
@@ -544,7 +542,7 @@ else:
                 st.error(f"Error exploring genres: {e}")
 
 # Live Shows
-elif "🎭 Live Shows" in menu:
+elif menu =="🎭 Live Shows":
     st.markdown("<h1 class='main-header'>Live Shows</h1>", unsafe_allow_html=True)
     
     # Location search
@@ -626,7 +624,7 @@ elif "🎭 Live Shows" in menu:
                     st.rerun()
 
 # Your Music
-elif "🎧 Your Music" in menu:
+elif "menu ==🎧 Your Music":
     st.markdown("<h1 class='main-header'>Your Music</h1>", unsafe_allow_html=True)
     
     tabs = st.tabs(["Saved Tracks", "Create Playlist", "Following"])
@@ -729,7 +727,7 @@ elif "🎧 Your Music" in menu:
             st.info("Switch to Spotify to see artists you follow.")
 
 # Preferences
-elif "⚙️ Preferences" in menu:
+elif menu =="⚙️ Preferences":
     st.markdown("<h1 class='main-header'>Your Preferences</h1>", unsafe_allow_html=True)
     
     tabs = st.tabs(["Music Preferences", "App Settings", "About"])
